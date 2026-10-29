@@ -1,0 +1,46 @@
+databases:
+  - name: shopverse-db
+    plan: free
+    databaseName: shopverse
+    user: shopverse_user
+
+services:
+  - type: web
+    name: shopverse-api
+    runtime: docker
+    rootDir: backend
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        fromDatabase:
+          name: shopverse-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: shopverse-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: shopverse-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: shopverse-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: shopverse-db
+          property: password
+      - key: FRONTEND_ORIGIN
+        value: https://shopverse-web.onrender.com
+  - type: web
+    name: shopverse-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://shopverse-api.onrender.com/api
